@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class DashboardController extends AbstractController
 {
     /**
-     * @Route("/dashboard", name="dashboard")
+     * @Route("/", name="dashboard")
      */
 
 
@@ -18,6 +18,7 @@ class DashboardController extends AbstractController
     {
         return $this->render('dashboard/index.html.twig', [
             'controller_name' => 'Pietje',
+            'username' => $this->getUser()->getNaam()
         ]);
     }
 

@@ -18,10 +18,6 @@ class Factuur
      */
     private $id;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Klant", mappedBy="factuur")
-     */
-    private $klant_nummer;
 
     /**
      * @ORM\Column(type="datetime")
@@ -34,11 +30,6 @@ class Factuur
     private $verval_datum;
 
     /**
-     * @ORM\Column(type="boolean")
-     */
-    private $in_zake_opdracht;
-
-    /**
      * @ORM\Column(type="integer", nullable=true)
      */
     private $korting;
@@ -48,9 +39,15 @@ class Factuur
      */
     private $factuurregels;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Klant", inversedBy="factuurs")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $klant_nummer;
+
     public function __construct()
     {
-        $this->klant_nummer = new ArrayCollection();
+
         $this->factuurregels = new ArrayCollection();
     }
 
@@ -59,36 +56,8 @@ class Factuur
         return $this->id;
     }
 
-    /**
-     * @return Collection|Klant[]
-     */
-    public function getKlantNummer(): Collection
-    {
-        return $this->klant_nummer;
-    }
 
-    public function addKlantNummer(Klant $klantNummer): self
-    {
-        if (!$this->klant_nummer->contains($klantNummer)) {
-            $this->klant_nummer[] = $klantNummer;
-            $klantNummer->setFactuur($this);
-        }
 
-        return $this;
-    }
-
-    public function removeKlantNummer(Klant $klantNummer): self
-    {
-        if ($this->klant_nummer->contains($klantNummer)) {
-            $this->klant_nummer->removeElement($klantNummer);
-            // set the owning side to null (unless already changed)
-            if ($klantNummer->getFactuur() === $this) {
-                $klantNummer->setFactuur(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getFactuurDatum(): ?\DateTimeInterface
     {
@@ -114,17 +83,6 @@ class Factuur
         return $this;
     }
 
-    public function getInZakeOpdracht(): ?bool
-    {
-        return $this->in_zake_opdracht;
-    }
-
-    public function setInZakeOpdracht(bool $in_zake_opdracht): self
-    {
-        $this->in_zake_opdracht = $in_zake_opdracht;
-
-        return $this;
-    }
 
     public function getKorting(): ?int
     {
@@ -172,5 +130,17 @@ class Factuur
     public function __toString()
     {
         return $this->getId().' ';
+    }
+
+    public function getKlantNummer(): ?Klant
+    {
+        return $this->klant_nummer;
+    }
+
+    public function setKlantNummer(?Klant $klant_nummer): self
+    {
+        $this->klant_nummer = $klant_nummer;
+
+        return $this;
     }
 }

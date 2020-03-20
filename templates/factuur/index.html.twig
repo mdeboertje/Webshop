@@ -11,7 +11,6 @@
                 <th>Id</th>
                 <th>Factuur_datum</th>
                 <th>Verval_datum</th>
-                <th>In_zake_opdracht</th>
                 <th>Korting</th>
                 <th>actions</th>
             </tr>
@@ -22,7 +21,6 @@
                 <td>{{ factuur.id }}</td>
                 <td>{{ factuur.factuurDatum ? factuur.factuurDatum|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ factuur.vervalDatum ? factuur.vervalDatum|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ factuur.inZakeOpdracht ? 'Yes' : 'No' }}</td>
                 <td>{{ factuur.korting }}</td>
                 <td>
                     <a href="{{ path('factuur_show', {'id': factuur.id}) }}">show</a>

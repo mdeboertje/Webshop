@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -61,9 +63,15 @@ class Klant implements UserInterface
     private $btw_nummer;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Factuur", inversedBy="klant_nummer")
+     * @ORM\OneToMany(targetEntity="App\Entity\Factuur", mappedBy="klant_nummer")
      */
-    private $factuur;
+    private $factuurs;
+
+    public function __construct()
+    {
+        $this->factuurs = new ArrayCollection();
+    }
+
 
     public function getId(): ?int
     {
@@ -203,15 +211,38 @@ class Klant implements UserInterface
         return $this;
     }
 
-    public function getFactuur(): ?Factuur
+    /**
+     * @return Collection|Factuur[]
+     */
+    public function getFactuurs(): Collection
     {
-        return $this->factuur;
+        return $this->factuurs;
     }
 
-    public function setFactuur(?Factuur $factuur): self
+    public function addFactuur(Factuur $factuur): self
     {
-        $this->factuur = $factuur;
+        if (!$this->factuurs->contains($factuur)) {
+            $this->factuurs[] = $factuur;
+            $factuur->setKlantNummer($this);
+        }
 
         return $this;
     }
+
+    public function removeFactuur(Factuur $factuur): self
+    {
+        if ($this->factuurs->contains($factuur)) {
+            $this->factuurs->removeElement($factuur);
+            // set the owning side to null (unless already changed)
+            if ($factuur->getKlantNummer() === $this) {
+                $factuur->setKlantNummer(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+
+
 }
