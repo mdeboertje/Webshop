@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Factuurregel{% endblock %}
+
+{% block body %}
+    <h1>Create new Factuurregel</h1>
+
+    {{ include('factuurregel/_form.html.twig') }}
+
+    <a href="{{ path('factuurregel_index') }}">back to list</a>
+{% endblock %}
