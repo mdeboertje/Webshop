@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 
+use App\Entity\Product;
+use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -14,11 +16,16 @@ class DashboardController extends AbstractController
      */
 
 
-    public function index()
+    public function index(ProductRepository $productRepository)
     {
+
+
         return $this->render('dashboard/index.html.twig', [
-            'controller_name' => 'Pietje',
-            'username' => $this->getUser()->getNaam()
+
+
+            'username' => $this->getUser()->getNaam(),
+            'products' => $productRepository->findAll(),
+
         ]);
     }
 

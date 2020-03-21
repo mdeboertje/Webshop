@@ -1,15 +1,48 @@
-{% extends 'base.html.twig' %}
+{% extends 'unauth.html.twig' %}
 
 {% block title %}Register{% endblock %}
 
 {% block body %}
-    <h1>Register</h1>
 
+<div class="container">
+    <h1 class="mt-5">Register</h1>
     {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            {{ form_row(registrationForm.email, {'attr': {'placeholder': 'seankingston@yahoo.com'} }) }}
+        </div>
+        <div class="form-group col-md-6">
+            {{ form_row(registrationForm.Password, {'attr': {'placeholder': 'Password'} })  }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ form_row(registrationForm.naam, {'attr': {'placeholder': 'Sean Kingston'} }) }}
+    </div>
+    <div class="form-group">
+        {{ form_row(registrationForm.straat, {'attr': {'placeholder': 'Walseweg 37'}}) }}
+    </div>
 
-        <button class="btn">Register</button>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            {{ form_row(registrationForm.plaats, {'attr': {'placeholder': 'Den Haag'} }) }}
+
+        </div>
+        <div class="form-group col-md-2">
+            {{ form_row(registrationForm.postcode, {'attr': {'placeholder': '3621 NL'}}) }}
+        </div>
+    <div class="form-group col-md-2">
+        {{ form_row(registrationForm.btwNummer, {'attr': {'placeholder': 'Optioneel'}}) }}
+    </div>
+    </div>
+
+    <button class="btn btn-primary ml-auto mr-auto">Register</button>
+    <p class="mt-2">Al een account? <span><a href="{{ path('app_login') }}">Log hier in!</a> </span></p>
     {{ form_end(registrationForm) }}
+</div>
+
+
+
+
+
 {% endblock %}
+

@@ -16,23 +16,28 @@
                 <a class="nav-link" href="{{ path('dashboard') }}">Dashboard</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ path('product_index') }}">Producten</a>
+                <a class="nav-link" href="{{ path('cart') }}">Winkelmandje</a>
             </li>
 
 
         </ul>
         <ul class="navbar-nav ml-auto">
+
+            <li class="nav-item ">
+                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">U bent ingelogt als {{  app.user.naam  }}</a>
+            </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Facturen
+                    CRUD's
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" href="{{ path('factuur_index') }}">Factuur</a>
                     <a class="dropdown-item" href="{{ path('factuurregel_index') }}">Factuur Regels</a>
+                    <a class="dropdown-item" href="{{ path('product_index') }}">Producten</a>
                 </div>
             </li>
             <li class="nav-item ">
-                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">U bent ingelogt als {{ app.user.getNaam }}</a>
+                <a class="nav-link " href="{{ path('app_logout') }}">Uitloggen</a>
             </li>
 
         </ul>

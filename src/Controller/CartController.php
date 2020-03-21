@@ -64,8 +64,8 @@ class CartController extends AbstractController
         $cart = $session->get('cart', array());
 
         // check if the $id already exists in it.
-        if ($product == NULL) {
-            $this->get('session')->setFlash('notice', 'This product is not     available in Stores');
+        if ($product == null) {
+            $this->addFlash('error', 'This item does not exist. Please Try Again' );
             return $this->redirect($this->generateUrl('cart'));
         } else {
             if (isset($cart[$id])) {
