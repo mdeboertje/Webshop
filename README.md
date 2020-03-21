@@ -1,7 +1,7 @@
 # Webshop
 School purposes
 
-#TODO
+# TODO
 
 Fix the for loop in the dashboard so that it automatically changes the id of the product when pressing add to cart.
 
