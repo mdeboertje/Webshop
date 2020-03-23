@@ -28,6 +28,14 @@ class DashboardController extends AbstractController
 
         ]);
     }
+    /**
+     * @Route("/success", name="success")
+     */
+    public function checkOutSuccess()
+    {
+        return $this->render('dashboard/success.html.twig');
+
+    }
 
 
 }

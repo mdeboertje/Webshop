@@ -14,19 +14,21 @@
         <div class="row">
 
         {% for product in products %}
+            {% if product is empty  %}
+                <h1>Er zijn momenteel geen producten beschikbaar.</h1>
+            {% else  %}
             <div class="col-xl-4">
 
-            <div class="card mt-2" style="width: 18rem;">
-                <img src="https://via.placeholder.com/300" class="card-img-top" alt="...">
+            <div class="card mt-4" style="width: 18rem;">
+                <img src="https://via.placeholder.com/300?text={{ product.omschrijving | replace({" " : "+"})  }}" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">{{ product.omschrijving }}</h5>
-                    <h5 class="card-title">{{ id }}</h5>
                     <p class="card-text">Prijs | ${{product.prijs}}</p>
-                    <a class="btn btn-primary" href="{{ path('cart_add', {'id': productId })}}">Add to cart</a>
+                    <a class="btn btn-primary" href="{{ path('cart_add', {'id': product.id })}}">Add to cart</a>
                 </div>
             </div>
             </div>
-
+            {% endif %}
         {% endfor %}
         </div>
 

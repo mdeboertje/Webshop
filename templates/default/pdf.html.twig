@@ -1,0 +1,52 @@
+{# ./templates/default/pdf.html.twig #}
+<html>
+<head>
+    <link type="text/css" href="pdf.css" rel="stylesheet" />
+</head>
+
+<body>
+<h2>Nieuwe bestelling!</h2>
+<b>Factuurgegevens</b>
+<table class="no-border">
+    <tr><th>Factuurnummer:</th><td>{{ factuur.id }}</td></tr>
+    <tr><th>Factuurdatum:</th><td>{{ factuur.factuurDatum | date('d-m-Y') }}</td></tr>
+    <tr><th>Einddatum:</th><td>{{ factuur.factuurDatum | date_modify('+ 30 days') | date('d-m-Y') }}</td></tr>
+    <tr><th>Korting:</th><td>{{ factuur.korting | default('Geen') }}</td></tr>
+</table>
+<br/>
+<b>Klantgegevens</b>
+<table class="no-border">
+    <tr><th>Klantnummer:</th><td>{{ factuur.klantNummer.id }}</td></tr>
+    <tr><th>Klantnaam:</th><td>{{ factuur.klantNummer.naam }}</td></tr>
+    <tr><th>Straat:</th><td>{{ factuur.klantNummer.straat }}</td></tr>
+    <tr><th>Postcode:</th><td>{{ factuur.klantNummer.postcode }}</td></tr>
+    <tr><th>Plaats:</th><td>{{ factuur.klantNummer.plaats }}</td></tr>
+    <tr><th>BTW nummer:</th><td>{{ factuur.klantNummer.btwNummer | default('Geen') }}</td></tr>
+</table>
+<br/>
+<b>Producten</b>
+<table>
+    <thead>
+    <tr><th>#</th><th>Product</th><th>Aantal</th><th>Prijs excl. btw</th><th>Btw</th></tr>
+    </thead>
+    <tbody>
+    {% set total = 0 %}
+    {% for id, amount in cart %}
+        <tr>
+            <td>{{ id }}</td>
+            {% for row in product %}
+                {% if row.id == id %}
+                    {% set total = total + (row.prijs * amount) %}
+                    <td>{{ row.omschrijving }}</td>
+                    <td>{{ amount }}</td>
+                    <td>{{ row.prijs }}</td>
+                    <td>{{ row.btw }}</td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<p>Totaalprijs: &euro;{{ total }}</p>
+</body>
+</html>

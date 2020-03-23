@@ -10,7 +10,8 @@ use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 
 /**
@@ -29,7 +30,7 @@ class CartController extends AbstractController
 
 
 
-        if ($cart != '')  {
+        if ($cart != '') {
             if (isset($cart) AND !empty($cart)) {
                 $product = $productRepository->findAll();
             } else {
@@ -38,7 +39,6 @@ class CartController extends AbstractController
                     'product' => false,
                 ));
             }
-
 
 
 
@@ -51,7 +51,10 @@ class CartController extends AbstractController
                 'empty' => true,
             ));
         }
+
+
     }
+
     /**
      * @Route("/add/{id}", name="cart_add")
      */
@@ -65,19 +68,12 @@ class CartController extends AbstractController
 
         // check if the $id already exists in it.
         if ($product == null) {
-            $this->addFlash('error', 'This item does not exist. Please Try Again' );
+            $this->addFlash('error', 'This item does not exist. Please Try Again');
             return $this->redirect($this->generateUrl('cart'));
         } else {
             if (isset($cart[$id])) {
 
                 ++$cart[$id];
-                /*  $qtyAvailable = $product->getQuantity();
-                  if ($qtyAvailable >= $cart[$id]['quantity'] + 1) {
-                      $cart[$id]['quantity'] = $cart[$id]['quantity'] + 1;
-                  } else {
-                      $this->get('session')->setFlash('notice', 'Quantity     exceeds the available stock');
-                      return $this->redirect($this->generateUrl('cart'));
-                  } */
             } else {
                 // if it doesnt make it 1
                 $cart[$id] = 1;
@@ -95,7 +91,7 @@ class CartController extends AbstractController
     /**
      * @Route("/checkout", name="checkout")
      */
-    public function checkoutAction(ProductRepository $productRepository, KlantRepository $klantRepository )
+    public function checkoutAction(ProductRepository $productRepository, KlantRepository $klantRepository, \Swift_Mailer $mailer)
     {
         // verwerken van regels in de nieuwe factuur voor de huidige klant.
         $session = $this->get('request_stack')->getCurrentRequest()->getSession();
@@ -105,8 +101,7 @@ class CartController extends AbstractController
         // aanmaken factuur regel.
 
         $em = $this->getDoctrine()->getManager();
-       $userAdress = $klantRepository->findOneBy(array('id' => $this->getUser()->getId()));
-
+        $userAdress = $klantRepository->findOneBy(array('id' => $this->getUser()->getId()));
 
 
 //         new UserAdress if no UserAdress found...
@@ -144,9 +139,30 @@ class CartController extends AbstractController
             }
         }
 
+        $message = (new \Swift_Message('Nieuwe bestelling met id #' . $factuur->getId()))
+            ->setFrom('no-reply@squidit.nl')
+            ->setTo($this->getUser()->getEmail())
+            ->setBody(
+                $this->renderView(
+                // templates/emails/registration.html.twig
+                    'emails/order.html.twig',
+                    ['cart' => $cart,
+                        'factuur' => $factuur,
+                        'product' => $productRepository]
+                ),
+                'text/html'
+            );
+
+        $mailer->send($message);
+
+
 
         $session->clear();
-        return $this->redirectToRoute('dashboard');
+
+        return $this->redirectToRoute('success');
+
+
+
     }
 
     /**
@@ -159,16 +175,18 @@ class CartController extends AbstractController
         $cart = $session->get('cart', array());
 
         // if it doesn't exist redirect to cart index page. end
-        if(!$cart[$id]) { $this->redirect( $this->generateUrl('cart') ); }
+        if (!$cart[$id]) {
+            $this->redirect($this->generateUrl('cart'));
+        }
 
         // check if the $id already exists in it.
-        if( isset($cart[$id]) ) {
+        if (isset($cart[$id])) {
             $cart[$id] = $cart[$id] - 1;
             if ($cart[$id] < 1) {
                 unset($cart[$id]);
             }
         } else {
-            return $this->redirect( $this->generateUrl('cart') );
+            return $this->redirect($this->generateUrl('cart'));
         }
 
         $session->set('cart', $cart);
@@ -176,7 +194,65 @@ class CartController extends AbstractController
         //echo('<pre>');
         //print_r($cart); echo ('</pre>');die();
 
-        return $this->redirect( $this->generateUrl('cart') );
+        return $this->redirect($this->generateUrl('cart'));
+    }
+
+
+    /**
+     * @Route("/", name="success")
+     */
+    public function downloadPDF(ProductRepository $productRepository, KlantRepository $klantRepository){
+        // verwerken van regels in de nieuwe factuur voor de huidige klant.
+        $session = $this->get('request_stack')->getCurrentRequest()->getSession();
+        // $cart = $session->set('cart', '');
+        $cart = $session->get('cart', array());
+
+        // aanmaken factuur regel.
+
+        $em = $this->getDoctrine()->getManager();
+        $userAdress = $klantRepository->findOneBy(array('id' => $this->getUser()->getId()));
+
+
+//         new UserAdress if no UserAdress found...
+        if (!$userAdress) {
+            $userAdress = new Klant();
+            $userAdress->getId();
+        }
+
+        $factuur = new Factuur();
+        $factuur->setFactuurDatum(new \DateTime("now"));
+        $factuur->setVervalDatum(new \DateTime("now + 30 days"));
+        $factuur->setKlantNummer($this->getUser());
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+
+        // Instantiate Dompdf with our options
+        $dompdf = new Dompdf($pdfOptions);
+
+        // Retrieve the HTML generated in our twig file
+        $html = $this->renderView(
+        // templates/emails/registration.html.twig
+            'default/pdf.html.twig',
+            ['cart' => $cart,
+                'factuur' => $factuur,
+                'product' => $productRepository]
+
+
+        );
+
+        // Load HTML to Dompdf
+        $dompdf->loadHtml($html);
+
+        // (Optional) Setup the paper size and orientation 'portrait' or 'portrait'
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+
+        // Output the generated PDF to Browser (force download)
+        $dompdf->stream($factuur->getId().".pdf", [
+            "Attachment" => true
+        ]);
     }
 
 }
