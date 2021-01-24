@@ -4,36 +4,88 @@
 
 {% block body %}
     <h1>Product index</h1>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+{#    <table class="table">#}
+{#        <thead>#}
+{#            <tr>#}
+{#                <th>Id</th>#}
+{#                <th>Omschrijving</th>#}
+{#                <th>Btw</th>#}
+{#                <th>Prijs</th>#}
+{#                <th>actions</th>#}
+{#            </tr>#}
+{#        </thead>#}
+{#        <tbody>#}
+{#        {% for product in products %}#}
+{#            <tr>#}
+{#                <td>{{ product.id }}</td>#}
+{#                <td>{{ product.omschrijving }}</td>#}
+{#                <td>{{ product.btw }}</td>#}
+{#                <td>{{ product.prijs }}</td>#}
+{#                <td>#}
+{#                    <a href="{{ path('product_show', {'id': product.id}) }}">show</a>#}
+{#                    <a href="{{ path('product_edit', {'id': product.id}) }}">edit</a>#}
+{#                </td>#}
+{#            </tr>#}
+{#        {% else %}#}
+{#            <tr>#}
+{#                <td colspan="5">no records found</td>#}
+{#            </tr>#}
+{#        {% endfor %}#}
+{#        </tbody>#}
+{#    </table>#}
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Omschrijving</th>
-                <th>Btw</th>
-                <th>Prijs</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for product in products %}
-            <tr>
+    {# total items count #}
+    <div class="count">
+        {{ pagination.getTotalItemCount }}
+    </div>
+    <table>
+        <tr>
+            {# sorting of properties based on query components #}
+            <th>{{ knp_pagination_sortable(pagination, 'Id', 'a.id') }}</th>
+            <th{% if pagination.isSorted('a.Title') %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Title', 'a.title') }}
+            </th>
+            <th{% if pagination.isSorted(['a.date', 'a.time']) %} class="sorted"{% endif %}>
+                {{ knp_pagination_sortable(pagination, 'Release', ['a.date', 'a.time']) }}
+            </th>
+        </tr>
+
+        {# table body #}
+        {% for product in pagination %}
+            <tr {% if loop.index is odd %}class="color"{% endif %}>
                 <td>{{ product.id }}</td>
                 <td>{{ product.omschrijving }}</td>
                 <td>{{ product.btw }}</td>
                 <td>{{ product.prijs }}</td>
-                <td>
-                    <a href="{{ path('product_show', {'id': product.id}) }}">show</a>
-                    <a href="{{ path('product_edit', {'id': product.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
             </tr>
         {% endfor %}
-        </tbody>
     </table>
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
 
     <a href="{{ path('product_new') }}">Create new</a>
+
+    <div>
+        <form action="{{ path('do-upload') }}" method="post" enctype="multipart/form-data">
+
+            <input type="hidden" name="token" value="{{ csrf_token('upload') }}" />
+
+            <div>
+                <label for="myfile">File to upload:</label>
+                <input type="file" name="myfile" id="myfile">
+            </div>
+
+            <button type="submit">Send</button>
+
+        </form>
+
+    </div>
+
 {% endblock %}

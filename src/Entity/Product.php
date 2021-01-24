@@ -17,7 +17,7 @@ class Product
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $omschrijving;
 
@@ -41,7 +41,7 @@ class Product
         return $this->omschrijving;
     }
 
-    public function setOmschrijving(string $omschrijving): self
+    public function setOmschrijving($omschrijving): self
     {
         $this->omschrijving = $omschrijving;
 

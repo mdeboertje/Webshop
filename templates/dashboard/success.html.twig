@@ -14,6 +14,7 @@
   <div class="row">
 
     <h3 class="alert alert-success mt-5 mx-auto">{{  app.user.naam  }} uw bestelling is doorgestuurd dank u wel voor de aankoop.</h3>
+    <a target="_blank" href="{{ path('pdf', {'id': factuur.id}) }}">Download hier pdf</a>
 
   </div>
 

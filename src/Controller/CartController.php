@@ -199,19 +199,14 @@ class CartController extends AbstractController
 
 
     /**
-     * @Route("/", name="success")
+     * @Route("/pdf/{id}", name="pdf")
      */
-    public function downloadPDF(ProductRepository $productRepository, KlantRepository $klantRepository){
-        // verwerken van regels in de nieuwe factuur voor de huidige klant.
-        $session = $this->get('request_stack')->getCurrentRequest()->getSession();
-        // $cart = $session->set('cart', '');
-        $cart = $session->get('cart', array());
+    public function downloadPDF(ProductRepository $productRepository, KlantRepository $klantRepository, Factuur $factuur, $id){
 
-        // aanmaken factuur regel.
+
 
         $em = $this->getDoctrine()->getManager();
         $userAdress = $klantRepository->findOneBy(array('id' => $this->getUser()->getId()));
-
 
 //         new UserAdress if no UserAdress found...
         if (!$userAdress) {
@@ -219,10 +214,9 @@ class CartController extends AbstractController
             $userAdress->getId();
         }
 
-        $factuur = new Factuur();
-        $factuur->setFactuurDatum(new \DateTime("now"));
-        $factuur->setVervalDatum(new \DateTime("now + 30 days"));
-        $factuur->setKlantNummer($this->getUser());
+        $factuur = $userAdress->getFactuurs();
+
+
         $pdfOptions = new Options();
         $pdfOptions->set('defaultFont', 'Arial');
 
@@ -231,9 +225,8 @@ class CartController extends AbstractController
 
         // Retrieve the HTML generated in our twig file
         $html = $this->renderView(
-        // templates/emails/registration.html.twig
             'default/pdf.html.twig',
-            ['cart' => $cart,
+            ['currentFactuur' => $id,
                 'factuur' => $factuur,
                 'product' => $productRepository]
 
@@ -250,7 +243,7 @@ class CartController extends AbstractController
         $dompdf->render();
 
         // Output the generated PDF to Browser (force download)
-        $dompdf->stream($factuur->getId().".pdf", [
+        $dompdf->stream( "bestelling.pdf", [
             "Attachment" => true
         ]);
     }

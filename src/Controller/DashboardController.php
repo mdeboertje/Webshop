@@ -4,6 +4,7 @@ namespace App\Controller;
 
 
 use App\Entity\Product;
+use App\Repository\FactuurRepository;
 use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,7 +17,7 @@ class DashboardController extends AbstractController
      */
 
 
-    public function index(ProductRepository $productRepository)
+    public function index(ProductRepository $productRepository, FactuurRepository $factuurRepository)
     {
 
 
@@ -33,7 +34,11 @@ class DashboardController extends AbstractController
      */
     public function checkOutSuccess()
     {
-        return $this->render('dashboard/success.html.twig');
+        return $this->render('dashboard/success.html.twig', [
+            'factuur' => $this->getUser()->getFactuurs()
+        ]);
+
+
 
     }
 
